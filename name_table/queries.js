@@ -1,45 +1,24 @@
-const { request, response } = require("express");
 const pool = require("./schema");
 //import sql shema
 
-const getItems = (request, response) => {
-  
-  const userEmail = request.user.email;
-  pool.query('SELECT * FROM items ORDER BY id ASC', (error, results) => {
-      if (error) {
-        throw error
-      };
-    const allItems = results.rows
-      console.log(userEmail, allItems);
-    })
+const getAllItems = async () => {
+  const items = await pool.query('SELECT * FROM items ORDER BY id ASC')
+  return items.rows
 }
 
-const getOrders = (request, response) => {
-  const user = getUserByEmail(request.user.email)
-  const id = user.id
-  console.log(id);
-  pool.query('SELECT * FROM user_order WHERE user_id = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.json(results.rows)
-    console.log(results.rows);
-  })
+const getUserOrders = async (user) => {
+  // const user = await getUserByEmail(request.user.email);
+  const res = await pool.query(
+    "SELECT * FROM user_order WHERE user_id = $1",
+    [user.id]
+  );
+  return(res.rows)
+};
+
+const getUserByEmail = async (email) => {
+  const users = await pool.query('SELECT * FROM users_auth WHERE email = $1', [email])
+  return users.rows[0];
 }
-
-const getUserByEmail = (email) => {
-
-  pool.query('SELECT * FROM users_auth WHERE email = $1,' [email], (error, results) => {
-    if (error) {
-      throw error
-    }
-    console.log(results);
-    const data = results.rows[0]
-    console.log(data);
-    return data
-  })
-}
-
   
 const getItemById = (request, response) => {
     const id = parseInt(request.params.id)
@@ -91,10 +70,11 @@ const deleteItem = (request, response) => {
 }
   
 module.exports = {
-    getItems,
+    getUserByEmail,
+    getAllItems,
     getItemById,
     createItem,
     updateItem,
     deleteItem,
-    getOrders
+    getUserOrders
 }
