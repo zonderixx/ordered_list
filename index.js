@@ -23,12 +23,13 @@ app.use(
 app.post('/register', register)
 app.post('/login', login)
 
+app.get('/orders', authorization, db.getOrders)
 
-app.get('/users', authorization, db.getUsers)
-app.get('/users/:id', authorization, db.getUserById)
-app.post('/users', authorization, db.createUser)
-app.put('/users/:id', authorization, db.updateUser)
-app.delete('/users/:id', authorization, db.deleteUser)
+app.get('/items', authorization, db.getItems)
+app.get('/items/:id', authorization, db.getItemById)
+app.post('/items', authorization, db.createItem)
+app.put('/items/:id', authorization, db.updateItem)
+app.delete('/items/:id', authorization, db.deleteItem)
 
 
 //running the server
