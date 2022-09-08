@@ -50,7 +50,7 @@ const createItem = async (request, response) => {
  const first = await pool.query(`SELECT count(*) FROM user_order WHERE user_id = '${user.id}'`)  
 
   await pool.query(
-    `INSERT INTO user_order (item_id, user_id, orders) VALUES ((SELECT id FROM items WsHERE name = '${itemName}'), (SELECT id from users_auth where email = '${user.email}'), ${parseInt(first.rows[0].count)+1})`,
+    `INSERT INTO user_order (item_id, user_id, orders) VALUES ((SELECT id FROM items WHERE name = '${itemName}'), (SELECT id FROM users_auth WHERE email = '${user.email}'), ${parseInt(first.rows[0].count)+1})`,
     );
   return response.json('Item created')  
 };
@@ -71,20 +71,17 @@ const updateItem = (request, response) => {
     )
 }
   
-const deleteItem = (request, response) => {
+const deleteItem = async (request, response) => {
     const id = parseInt(request.params.id)
-  
-    pool.query('DELETE FROM items WHERE id = $1', [id], (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).send(`Item deleted with ID: ${id}`)
-    })
+    await pool.query('DELETE FROM items WHERE id = $1', [id])
+
+    await pool.query('DELETE FROM user_order WHERE item_id = $1', [id])
+    return response.json(`Item deleted with ID: ${id}`)
 }
   
 module.exports = {
     getUserByEmail,
-    getAllItems,
+    getAllItems, 
     getItemById,
     createItem,
     updateItem,
