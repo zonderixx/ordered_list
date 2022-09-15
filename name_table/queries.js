@@ -27,12 +27,8 @@ const getItemByEmail = async (email) => {
 const getItemById = (request, response) => {
     const id = parseInt(request.params.id)
   
-    pool.query('SELECT * FROM items WHERE id = $1', [id], (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).json(results.rows)
-    })
+    const item = pool.query('SELECT * FROM items WHERE id = $1', [id])
+    return item.rows
 }
   
 const createItem = async (request, response) => {
@@ -61,14 +57,8 @@ const updateItem = (request, response) => {
   
     pool.query(
       'UPDATE items SET name = $1, email = $2 WHERE id = $3',
-      [name, email, id],
-      (error, results) => {
-        if (error) {
-          throw error
-        }
-        response.status(200).send(`Item modified with ID: ${id}`)
-      }
-    )
+      [name, email, id])
+    return response.status(200).send(`Item modified with ID: ${id}`)
 }
   
 const deleteItem = async (request, response) => {
