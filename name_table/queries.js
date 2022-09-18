@@ -1,6 +1,16 @@
 const pool = require("./schema");
 //import sql shema
 
+const getAllItemsForUsers = (request, response) => {
+  pool.query('SELECT * FROM items ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+// for sorting allItems
 const getAllItems = async () => {
   const items = await pool.query('SELECT * FROM items ORDER BY id ASC')
   return items.rows
@@ -27,8 +37,12 @@ const getItemByEmail = async (email) => {
 const getItemById = (request, response) => {
     const id = parseInt(request.params.id)
   
-    const item = pool.query('SELECT * FROM items WHERE id = $1', [id])
-    return item.rows
+    pool.query('SELECT * FROM items WHERE id = $1', [id], (error, results) => {
+      if (error) {
+        throw error
+      }
+      response.status(200).json(results.rows)
+    })
 }
   
 const createItem = async (request, response) => {
@@ -51,16 +65,6 @@ const createItem = async (request, response) => {
   return response.json('Item created')  
 };
   
-const updateItem = (request, response) => {
-    const id = parseInt(request.params.id)
-    const { name, email } = request.body
-  
-    pool.query(
-      'UPDATE items SET name = $1, email = $2 WHERE id = $3',
-      [name, email, id])
-    return response.status(200).send(`Item modified with ID: ${id}`)
-}
-  
 const deleteItem = async (request, response) => {
     const id = parseInt(request.params.id)
     await pool.query('DELETE FROM items WHERE id = $1', [id])
@@ -74,7 +78,7 @@ module.exports = {
     getAllItems, 
     getItemById,
     createItem,
-    updateItem,
     deleteItem,
-    getUserOrders
+    getUserOrders,
+    getAllItemsForUsers
 }

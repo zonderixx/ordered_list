@@ -27,10 +27,9 @@ app.post('/login', login)
 app.get('/', authorization, getUserItems)
 app.get('/orders', authorization, db.getUserOrders)
 
-app.get('/items', authorization, db.getAllItems)
+app.get('/items', authorization, db.getAllItemsForUsers)
 app.get('/items/:id', authorization, db.getItemById)
 app.post('/items', authorization, db.createItem)
-app.put('/items/:id', authorization, db.updateItem)
 app.delete('/items/:id', authorization, db.deleteItem)
 
 
